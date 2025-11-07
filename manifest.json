@@ -1,0 +1,13 @@
+{
+  "name": "AI → Figma Sync",
+  "id": "ai-figma-sync",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://figma-inbox-proxy.vercel.app",
+      "https://hook.eu2.make.com"
+    ]
+  }
+}

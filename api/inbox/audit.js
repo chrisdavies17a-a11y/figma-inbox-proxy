@@ -1,26 +1,53 @@
+// pages/api/inbox/audit.js (Next.js Pages API)
+
+export const config = {
+  api: {
+    // Stop Next/Vercel from auto-parsing the body.
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req, res) {
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-make-secret');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-signature');
 
   if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+    res.status(200).end();
+    return;
   }
 
+  if (req.method !== 'POST') {
+    res.status(405).json({ ok: false, error: 'Method not allowed' });
+    return;
+  }
+
+  // Read RAW body (because we disabled bodyParser)
+  let raw = '';
   try {
-    const providedSecret = req.headers['x-make-secret'];
-    const validSecret = process.env.MAKE_SECRET || 'supersecret1234';
-
-    if (providedSecret !== validSecret) {
-      return res.status(401).json({ error: 'Invalid secret key' });
-    }
-
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    console.log('✅ Received from Make:', body);
-
-    return res.status(200).json({ ok: true, received: body });
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return res.status(500).json({ ok: false, error: error.message });
+    for await (const chunk of req) raw += chunk;
+  } catch (e) {
+    res.status(400).json({ ok: false, error: 'Failed to read body' });
+    return;
   }
+
+  if (!raw) {
+    res.status(400).json({ ok: false, error: 'Empty body' });
+    return;
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(raw); // Now we parse ourselves
+  } catch (e) {
+    res.status(400).json({ ok: false, error: 'Invalid JSON', raw });
+    return;
+  }
+
+  // (Optional) log for debugging
+  console.log('Received from Make:', payload);
+
+  // Echo back so Make can see success
+  res.status(200).json({ ok: true, received: payload });
 }

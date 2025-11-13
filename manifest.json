@@ -6,8 +6,7 @@
   "editorType": ["figma"],
   "networkAccess": {
     "allowedDomains": [
-      "https://figma-inbox-proxy.vercel.app",
-      "https://hook.eu2.make.com"
+      "https://figma-inbox-proxy.vercel.app"
     ]
   }
 }

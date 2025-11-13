@@ -1,3 +1,4 @@
+// test edit so GitHub enables commit
 // api/inbox.js
 // Single endpoint for both:
 // - POST from Make  → cache the latest payload
